@@ -11,15 +11,14 @@
 	}
   ],
   "require": {
-	"php": ">=5.6",
-	"solumdesignum/scenarios": "^1.0.0"
+	"php": ">=5.6"
   },
   "autoload": {
 	"psr-4": {
 	  "SolumDeSignum\\Scenarios\\": "src"
 	}
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "prefer-stable": true,
   "extra": {
 	"laravel": {
