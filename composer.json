@@ -1,36 +1,30 @@
 {
-    "name": "solumdesignum/scenarios",
-    "description": "Dynamic Validation Scenarios",
-    "type": "libary",
-  	"homepage": "https://solum-designum.com",
-  	"license": "MIT",
-    "authors":
-    [
-        {
-            "name": "Faks",
-            "email": "solumdesignum@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require":
-    {
-        "php": ">=5.6.0"
-    },
-    "autoload":
+  "name": "solumdesignum/scenarios",
+  "description": "Dynamic Validation Scenarios",
+  "type": "libary",
+  "homepage": "https://solum-designum.com",
+  "license": "MIT",
+  "authors": [
 	{
-        "psr-4":
-		{
-            "SolumDeSignum\\Scenarios\\": "src"
-        }
-    },
-    "extra":
-	{
-        "laravel":
-		{
-            "providers":
-			[
-                "SolumDeSignum\\Scenarios\\ScenariosServiceProvider"
-            ]
-        }
-    }
+	  "name": "Faks",
+	  "email": "solumdesignum@gmail.com"
+	}
+  ],
+  "minimum-stability": "dev",
+  "require": {
+	"php": ">=5.6",
+	"solumdesignum/scenarios": "dev-master"
+  },
+  "autoload": {
+	"psr-4": {
+	  "SolumDeSignum\\Scenarios\\": "src"
+	}
+  },
+  "extra": {
+	"laravel": {
+	  "providers": [
+		"SolumDeSignum\\Scenarios\\ScenariosServiceProvider"
+	  ]
+	}
+  }
 }
