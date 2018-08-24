@@ -10,7 +10,6 @@
 	  "email": "solumdesignum@gmail.com"
 	}
   ],
-  "minimum-stability": "dev",
   "require": {
 	"php": ">=5.6",
 	"solumdesignum/scenarios": "^1.0"
@@ -20,6 +19,8 @@
 	  "SolumDeSignum\\Scenarios\\": "src"
 	}
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "extra": {
 	"laravel": {
 	  "providers": [
