@@ -1,4 +1,5 @@
-### Requirements Laravel 5.x
+### Laravel Scenarios: requires Laravel 5.x
+
 
 ### Installation
 You can install Laravel Scenarios through [Composer](https://getcomposer.org):
