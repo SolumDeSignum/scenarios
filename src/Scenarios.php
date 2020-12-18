@@ -43,9 +43,12 @@ trait Scenarios
 
     /**
      * Scenarios constructor.
+     *
+     * @param array $attributes
      */
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
+        parent::__construct($attributes);
         $this->scenario = $this->setFromCurrentUrl();
     }
 
