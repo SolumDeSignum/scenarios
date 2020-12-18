@@ -1,7 +1,7 @@
 {
   "name": "solumdesignum/scenarios",
   "description": "Laravel Dynamic Validation Scenarios",
-  "type": "composer-plugin",
+  "type": "project",
   "homepage": "https://solum-designum.eu",
   "license": "MIT",
   "authors": [
