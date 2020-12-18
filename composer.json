@@ -1,30 +1,70 @@
 {
-  "name": "solumdesignum/scenarios",
-  "description": "Dynamic Validation Scenarios",
-  "type": "libary",
-  "homepage": "https://solum-designum.com",
-  "license": "MIT",
-  "authors": [
-	{
-	  "name": "Faks",
-	  "email": "solumdesignum@gmail.com"
-	}
-  ],
-  "require": {
-	"php": ">=5.6"
-  },
-  "autoload": {
-	"psr-4": {
-	  "SolumDeSignum\\Scenarios\\": "src"
-	}
-  },
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "extra": {
-	"laravel": {
-	  "providers": [
-		"SolumDeSignum\\Scenarios\\ScenariosServiceProvider"
-	  ]
-	}
-  }
+    "name": "solumdesignum/scenarios",
+    "description": "Laravel Dynamic Validation Scenarios",
+    "keywords": [
+        "laravel-scenarios",
+        "laravel-dynamic-validation",
+        "scenarios",
+        "validation",
+        "dynamic",
+        "laravel"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oskars Germovs",
+            "email": "oskars_germovs@inbox.lv",
+            "homepage": "https://solum-designum.eu",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/solumdesignum/scenarios",
+    "require": {
+        "php": "^7.0|^7.1|^7.2|^7.3|^7.4|^8.0",
+        "illuminate/support": "~5|~6|~7|~8"
+    },
+    "require-dev": {
+        "php": "^7.0|^7.1|^7.2|^7.3|^7.4|^8.0",
+        "illuminate/support": "~5|~6|~7|~8"
+    },
+    "autoload": {
+        "psr-4": {
+            "SolumDeSignum\\Scenarios\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SolumDeSignum\\Scenarios\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SolumDeSignum\\Scenarios\\ScenariosServiceProvider"
+            ],
+            "branch-alias": {
+                "dev-master": "1.x-master",
+                "dev-dev": "1.x-dev"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "post-update-cmd": [
+            "composer phpcbf"
+        ],
+        "phpstan": [
+            "php artisan code:analyse --level=max"
+        ],
+        "phpcs": [
+            "phpcs --standard=PSR12 /$(pwd)"
+        ],
+        "phpcbf": [
+            "phpcbf --standard=PSR12 /$(pwd)"
+        ]
+    }
 }

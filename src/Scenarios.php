@@ -1,124 +1,140 @@
 <?php
-	/**
-	 * Created by PhpStorm.
-	 * User: Faks
-	 * GitHub: https://github.com/Faks
-	 *******************************************
-	 * Company Name: Solum DeSignum
-	 * Company Website: http://solum-designum.com
-	 * Company GitHub: https://github.com/SolumDeSignum
-	 ********************************************************
-	 * Date: 2018.07.30.
-	 * Time: 20:19
-	 */
-	
-	namespace SolumDeSignum\Scenarios;
-	
-	use Illuminate\Support\Facades\Route;
-	use function ucfirst;
-	
-	
-	/**
-	 * Trait Scenarios
-	 * @package SolumDeSignum\Scenarios
-	 */
-	trait Scenarios
-	{
-		/**
-		 *
-		 */
-		public static $CURRENT_CONTROLLER_NAME_PATTERN = "/[_]([a-zA-Z]+)[_]|[_]([a-zA-Z]+)/m";
-		/**
-		 *
-		 */
-		public static $SCENARIO_PATTERN = '/create|update/im';
-		/**
-		 *
-		 */
-		public static $SCENARIO_CREATE = 'create';
-		/**
-		 *
-		 */
-		public static $SCENARIO_UPDATE = 'update';
-		/**
-		 * @var
-		 */
-		public static $SCENARIO_DESTROY = 'destroy';
-		/**
-		 * @var
-		 */
-		public $Scenario;
-		
-		
-		/**
-		 * Create a new rule instance.
-		 *
-		 * @return void
-		 */
-		
-		public function __construct()
-		{
-			$this->Scenario;
-		}
-		
-		/**
-		 * @param $method
-		 * @return bool
-		 */
-		public function Scenario_Pattern_Filter($method)
-		{
-			preg_match_all(self::$SCENARIO_PATTERN , strtolower($method), $matches);
-			
-			return $matches[0][0] ?? isset($matches[0][0]);
-		}
-		
-		/**
-		 * @return bool
-		 */
-		public function Scenario_Set_From_Current_Url()
-		{
-			$getActionMethod = self::Scenario_Pattern_Filter(self::Scenario_Current_Controller());
-			$getRequestUri = self::Scenario_Pattern_Filter(self::Scenario_Current_Request_Uri());
-			
-			if ($getActionMethod === $getRequestUri)
-			{
-				return $this->Scenario = $getActionMethod;
-			}
-			else
-			{
-				#FallBack Scenario / Mitigate Artisan Issues
-				return $this->Scenario = self::$SCENARIO_CREATE;
-			}
-		}
-		
-		/**
-		 * @return string
-		 */
-		public function Scenario_Current_Controller()
-		{
-			if (!empty(Route::current()))
-			{
-				return Route::current()->getActionMethod();
-			}
-		}
-		
-		/**
-		 * @return string
-		 */
-		public function Scenario_Current_Request_Uri()
-		{
-			if (!empty(Route::getCurrentRequest()))
-			{
-				return Route::getCurrentRequest()->getRequestUri();
-			}
-		}
-		
-		/**
-		 * @return string
-		 */
-		public function Current_Controller_Function_Name()
-		{
-			preg_match_all(self::$CURRENT_CONTROLLER_NAME_PATTERN , self::Scenario_Current_Controller(), $matches, PREG_SET_ORDER, 1);
-			return ucfirst($matches[0][1] ?? isset($matches[0][1]) ?:  $matches[0][2] ?? isset($matches[0][2]));
-		}
-	}
+
+declare(strict_types=1);
+
+namespace SolumDeSignum\Scenarios;
+
+use Illuminate\Support\Facades\Route;
+
+use function config;
+use function is_bool;
+
+trait Scenarios
+{
+    /**
+     * @var string
+     */
+    public $scenario;
+
+    /**
+     * @var string
+     */
+    public $setMethodFromController;
+
+    /**
+     * @var string
+     */
+    public $setMethodFromUrl;
+
+    /**
+     * Create a new rule instance.
+     *
+     * Scenarios constructor.
+     * @throws \Exception
+     */
+    public function __construct()
+    {
+        // Set Config
+        $this->setMethodFromController = config(
+            'scenarios.features.setMethodFromController',
+            true
+        );
+        $this->setMethodFromUrl = config(
+            'scenarios.features.setMethodFromUrlSegment',
+            false
+        );
+
+        // Detect package abuse
+        $this->exceptionOneSetMethod();
+        $this->exceptionOnlyOneSetMethod();
+
+        // setMethod based on Controller function
+        if ($this->setMethodFromController) {
+            $this->scenario = $this->patternFilter($this->currentControllerMethod());
+        }
+
+        // setMethod based on Request segment based on $controllerMethodPattern
+        if ($this->setMethodFromUrl) {
+            $this->scenario = $this->patternFilter($this->currentRequestUri());
+        }
+    }
+
+    /**
+     * @param $method
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function patternFilter($method): string
+    {
+        preg_match_all(
+            config('scenarios.methods.pattern'),
+            strtolower($method),
+            $matches
+        );
+
+        $this->exceptionScenarioPattern($matches[0][0]);
+
+        return $matches[0][0];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function currentControllerMethod(): ?string
+    {
+        return Route::current() !== null ?
+            Route::current()->getActionMethod() :
+            null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function currentRequestUri(): ?string
+    {
+        return Route::getCurrentRequest() !== null ?
+            Route::getCurrentRequest()->getRequestUri() :
+            null;
+    }
+
+    /**
+     * @param mixed $matches
+     *
+     * @throws \Exception
+     */
+    private function exceptionScenarioPattern($matches): void
+    {
+        if (isset($matches) === false) {
+            throw new \Exception(
+                'Scenarios patternFilter failed finding match, check $scenarioPattern , LIKE RIGHT NOW !!!'
+            );
+        }
+    }
+
+    private function exceptionOneSetMethod(): void
+    {
+        if (
+            is_bool($this->setMethodFromController) === false ||
+            is_bool($this->setMethodFromUrl) === false ||
+            ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
+        ) {
+            throw new \Exception(
+                'Please enable at least one setMethod function, LIKE RIGHT NOW !!!'
+            );
+        }
+    }
+
+    private function exceptionOnlyOneSetMethod(): void
+    {
+        if (
+            is_bool($this->setMethodFromController) === false ||
+            is_bool($this->setMethodFromUrl) === false ||
+            ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
+        ) {
+            throw new \Exception(
+                'Please enable only one setMethod function, LIKE RIGHT NOW !!!'
+            );
+        }
+    }
+}
