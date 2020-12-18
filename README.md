@@ -1,4 +1,4 @@
-### Laravel Scenarios: requires Laravel 5.x
+### Laravel Scenarios: requires Laravel 5.x - 8.x
 
 
 ### Installation
@@ -10,10 +10,11 @@ $ composer require solumdesignum/scenarios:dev-master
 
 ### Further steps are required please follow setup guide.
 
+
 ### Model Usage / Setup
 ```php
 use SolumDeSignum\Scenarios\Scenarios;
-use App\Validation\Sample_Rules;
+use App\Validation\SampleRules;
 
 class Sample extends Model
 {
@@ -21,20 +22,9 @@ class Sample extends Model
 
   protected $table = 'sample';
 
-  public function __construct()
+  public function __construct(array $attributes = [])
   {
-    $this->Scenario_Set_From_Current_Url();
-    parent::__construct();
-  }
-
-  public function Dynamic_Rules(array $data)
-  {
-    return Validator::make($data , Sample_Rules::Scenario_Rules($this->Scenario));
-  }
-
-  public function init()
-  {
-    return new self();
+    parent::__construct($attributes);
   }
 }
 ```
@@ -46,24 +36,16 @@ namespace App\Validation;
 	
 use SolumDeSignum\Scenarios\Scenarios;
 
-class Sample_Rules
+class SampleRules
 {
-  public static function Scenario_Rules($scenario)
+  public static function ScenarioRules($scenario): ?array
   {
     switch ($scenario)
     {
-      case $scenario == Scenarios::$SCENARIO_CREATE;
+      case $scenario === Scenarios::$scenarioUpdate: case $scenario === Scenarios::$scenarioCreate;
         return
           [
             'text' => 'required|string',
-          ];
-        break;
-
-      case $scenario == Scenarios::$SCENARIO_UPDATE;
-        return
-          [
-            'text' => 'required|string',
-
           ];
         break;
 
@@ -80,7 +62,7 @@ class Sample_Rules
 
 ### Controller Usage / Setup
 ```php
-$validator = Sample::init()->Dynamic_Rules($request->all());
+$validator = $this->validator($request->all(), SampleRules::ScenarioRules($this->scenario));
 if ($validator->passes())
 {
   #Your Logic Code
@@ -90,7 +72,7 @@ if ($validator->passes())
 
 ### Controller Function Naming Conventions
 ```php
-public function Do_Create_My_Sample()
+public function doCreateMySample()
 {
   #Your Logic Code
 }
@@ -100,15 +82,15 @@ public function Do_Create_My_Sample()
 ### Controller Function Naming Conventions / Model Override: Camel Case
 ```php
 #Camel Case Conventions
-public static $CURRENT_CONTROLLER_NAME_PATTERN = "/Create|Update|Destroy/m";
+public static $controllerNamePattern = "/create|update|destroy/m";
 
-#Controller Function Naming Samples: DoCreateMySample() , DoUpdateMySample() , DoDestroyMySample()
+#Controller Function Naming Samples: doCreateMySample() , doUpdateMySample() , doDestroyMySample()
 ```
 
 
 Author
 -------
-- [Jonh Mark](http://solum-designum.com) ([Twitter](https://twitter.com/faksx))
+- [Oskars Germovs](http://solum-designum.eu) ([Twitter](https://twitter.com/faksx))
 
 
 Support
