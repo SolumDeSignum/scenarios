@@ -61,7 +61,7 @@ trait Scenarios
     {
         preg_match_all(self::$scenarioPattern, strtolower($method), $matches);
 
-        return isset($matches[0][0]) === false ? $matches[0][0] : null;
+        return isset($matches[0][0]) === true ? $matches[0][0] : null;
     }
 
     /**
