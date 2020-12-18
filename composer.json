@@ -3,9 +3,10 @@
     "description": "Laravel Dynamic Validation Scenarios",
     "keywords": [
         "laravel-scenarios",
-        "dynamic",
+        "scenarios",
         "validation",
-        "scenarioss"
+        "dynamic",
+        "laravel"
     ],
     "license": "MIT",
     "type": "project",
