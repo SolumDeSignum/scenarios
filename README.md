@@ -1,36 +1,108 @@
-### Laravel Scenarios: requires Laravel 5.x - 8.x
+###Introduction
+Solum DeSignum Scenarios is agnostic backend validation Scenarios package.
 
 
 ### Installation
-You can install Laravel Scenarios through [Composer](https://getcomposer.org):
+To get started, install Scenarios using the Composer package manager:
+```shell
+composer require solumdesignum/scenarios
+```
+
+Next, publish Scenarios resources using the vendor:publish command:
 
 ```shell
-$ composer require solumdesignum/scenarios:dev-master
+php artisan vendor:publish --provider="SolumDeSignum\Scenarios\ScenariosServiceProvider"
 ```
 
-### Further steps are required please follow setup guide.
+This command will publish Scenarios config to your config directory, which will be
+ created if it does not exist.
 
 
-### Model Usage / Setup
+### Scenarios Features
+The Scenarios configuration file contains a configuration array.
 ```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'features' => [
+        'setMethodFromUrlSegment' => false,
+        'setMethodFromController' => true,
+    ],
+    'methods' => [
+        'pattern' => '/create|store|update|destroy/im'
+    ]
+];
+````
+
+### Scenario's With Form Request Validation
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use SolumDeSignum\Scenarios\Scenarios;
-use App\Validation\SampleRules;
 
-class Sample extends Model
+
+class OfficeBlogRequest extends FormRequest
 {
-  use Scenarios;
+    use Scenarios;
 
-  protected $table = 'sample';
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return Auth::check();
+    }
 
-  public function __construct(array $attributes = [])
-  {
-    parent::__construct($attributes);
-  }
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        $rules = [];
+
+        if ($this->scenario === 'store') {
+            $rules = [
+                'title' => 'required|string',
+                'publish_at' => 'required',
+                'blog_category_id' => 'required|numeric',
+                'description' => 'required',
+            ];
+        }
+
+        if ($this->scenario === 'update') {
+            $rules = [
+                'title' => 'required|string',
+                'publish_at' => 'required',
+                'blog_category_id' => 'required|numeric',
+                'description' => 'required',
+                'img' => 'image',
+            ];
+        }
+
+        if ($this->scenario === 'destroy') {
+            $rules = [];
+        }
+
+        return $rules;
+    }
 }
-```
+````
 
 
-### Validation Rules Usage / Setup
+### Validation Rules Usage
+#### However, can be used on both examples
 ```php
 namespace App\Validation;
 	
@@ -38,53 +110,70 @@ use SolumDeSignum\Scenarios\Scenarios;
 
 class SampleRules
 {
-  public static function ScenarioRules($scenario): ?array
+  public static function ScenarioRules(string $scenario): ?array
   {
-    switch ($scenario)
-    {
-      case $scenario === Scenarios::$scenarioUpdate: case $scenario === Scenarios::$scenarioCreate;
-        return
-          [
-            'text' => 'required|string',
-          ];
-        break;
+        switch ($scenario) {
+            case $scenario === 'store';
+                return
+                    [
+                        'text' => 'required|string',
+                    ];
+                break;
 
-      default: return
-        [
-          'text' => 'required|string',
-
-        ];
-    }
+            case $scenario === 'update';
+                return
+                    [
+                        'text' => 'required|string',
+                        'description' => 'required|string',
+                    ];
+                break;
+        }
   }
 }
 ```
 
-
-### Controller Usage / Setup
+### Scenario's With Controller 
+#### Manually Creating Validators
 ```php
-$validator = $this->validator($request->all(), SampleRules::ScenarioRules($this->scenario));
-if ($validator->passes())
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Office\Blog;
+
+use Illuminate\Support\Facades\Validator;
+use SolumDeSignum\Scenarios\Scenarios;
+use App\Validation\SampleRules;
+
+class BlogController
 {
-  #Your Logic Code
+    use Scenarios;
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), SampleRules::ScenarioRules($this->scenario));
+        if ($validator->passes()) {
+            #Your Logic Code
+        }
+    }
 }
 ```
 
 
-### Controller Function Naming Conventions
+### Controller Functions Names Examples
+#### However, you can override regex with your naming conventions inside configuration
 ```php
-public function doCreateMySample()
-{
-  #Your Logic Code
-}
-```
+<?php
 
+declare(strict_types=1);
 
-### Controller Function Naming Conventions / Model Override: Camel Case
-```php
-#Camel Case Conventions
-public static $controllerNamePattern = "/create|update|destroy/m";
+return [
+    'methods' => [
+        'pattern' => '/create|store|update|destroy/im'
+    ]
+];
 
-#Controller Function Naming Samples: doCreateMySample() , doUpdateMySample() , doDestroyMySample()
+#Controller Function Naming Samples: create(), store() , update() , destroy()
 ```
 
 
@@ -100,19 +189,4 @@ If you need support you can ask on [Twitter](https://twitter.com/faksx).
 
 License
 -------
-The MIT License (MIT)
-
-Copyright (c) 2018 Solum DeSignum
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
-Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Solum DeSignum Scenarios is open-sourced software licensed under the [MIT license](LICENSE.md).

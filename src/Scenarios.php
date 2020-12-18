@@ -5,80 +5,83 @@ declare(strict_types=1);
 namespace SolumDeSignum\Scenarios;
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 
-use function ucfirst;
+use function config;
+use function is_bool;
 
 trait Scenarios
 {
     /**
      * @var string
      */
-    public static $controllerNamePattern = '([a-zA-Z]+)|[_]([a-zA-Z]+)[_]|[_]([a-zA-Z]+)';
-
-    /**
-     * @var string
-     */
-    public static $scenarioPattern = '/create|update/im';
-
-    /**
-     * @var string
-     */
-    public static $scenarioCreate = 'create';
-
-    /**
-     * @var string
-     */
-    public static $scenarioUpdate = 'update';
-
-    /**
-     * @var string
-     */
-    public static $scenarioDestroy = 'destroy';
-
-    /**
-     * @var string
-     */
     public $scenario;
 
     /**
-     * Scenarios constructor.
-     *
-     * @param array $attributes
+     * @var string
      */
-    public function __construct(array $attributes = [])
+    public $setMethodFromController;
+
+    /**
+     * @var string
+     */
+    public $setMethodFromUrl;
+
+    /**
+     * Create a new rule instance.
+     *
+     * Scenarios constructor.
+     * @throws \Exception
+     */
+    public function __construct()
     {
-        parent::__construct($attributes);
-        $this->scenario = $this->setFromCurrentUrl();
+        // Set Config
+        $this->setMethodFromController = config(
+            'scenarios.features.setMethodFromController',
+            true
+        );
+        $this->setMethodFromUrl = config(
+            'scenarios.features.setMethodFromUrlSegment',
+            false
+        );
+
+        // Detect package abuse
+        $this->exceptionOneSetMethod();
+        $this->exceptionOnlyOneSetMethod();
+
+        // setMethod based on Controller function
+        if ($this->setMethodFromController) {
+            $this->scenario = $this->patternFilter($this->currentControllerMethod());
+        }
+
+        // setMethod based on Request segment based on $controllerMethodPattern
+        if ($this->setMethodFromUrl) {
+            $this->scenario = $this->patternFilter($this->currentRequestUri());
+        }
     }
 
     /**
      * @param $method
      *
-     * @return string|null
+     * @return string
+     * @throws \Exception
      */
-    public function patternFilter($method): ?string
+    public function patternFilter($method): string
     {
-        preg_match_all(self::$scenarioPattern, strtolower($method), $matches);
+        preg_match_all(
+            config('scenarios.methods.pattern'),
+            strtolower($method),
+            $matches
+        );
 
-        return isset($matches[0][0]) === true ? $matches[0][0] : null;
+        $this->exceptionScenarioPattern($matches[0][0]);
+
+        return $matches[0][0];
     }
 
     /**
      * @return string|null
      */
-    public function setFromCurrentUrl(): ?string
-    {
-        $getActionMethod = $this->patternFilter($this->currentController());
-        $getRequestUri = $this->patternFilter($this->currentRequestUri());
-        return $getActionMethod === $getRequestUri ? $getActionMethod :
-            self::$scenarioCreate;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function currentController(): ?string
+    public function currentControllerMethod(): ?string
     {
         return Route::current() !== null ?
             Route::current()->getActionMethod() :
@@ -96,33 +99,42 @@ trait Scenarios
     }
 
     /**
-     * @return string
+     * @param mixed $matches
+     *
+     * @throws \Exception
      */
-    public function currentControllerFunctionName(): string
+    private function exceptionScenarioPattern($matches): void
     {
-        preg_match_all(
-            self::$controllerNamePattern,
-            $this->currentController(),
-            $matches,
-            PREG_SET_ORDER,
-            1
-        );
-
-        return ucfirst(
-            $matches[0][1] ?? isset($matches[0][1]) ?:
-                $matches[0][2] ??
-                isset($matches[0][2])
-        );
+        if (isset($matches) === false) {
+            throw new \Exception(
+                'Scenarios patternFilter failed finding match, check $scenarioPattern , LIKE RIGHT NOW !!!'
+            );
+        }
     }
 
-    /**
-     * @param array $data
-     * @param array $callbackRule
-     *
-     * @return \Illuminate\Contracts\Validation\Validator|\Illuminate\Validation\Validator
-     */
-    public function validator(array $data, array $callbackRule)
+    private function exceptionOneSetMethod(): void
     {
-        return Validator::make($data, $callbackRule);
+        if (
+            is_bool($this->setMethodFromController) === false ||
+            is_bool($this->setMethodFromUrl) === false ||
+            ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
+        ) {
+            throw new \Exception(
+                'Please enable at least one setMethod function, LIKE RIGHT NOW !!!'
+            );
+        }
+    }
+
+    private function exceptionOnlyOneSetMethod(): void
+    {
+        if (
+            is_bool($this->setMethodFromController) === false ||
+            is_bool($this->setMethodFromUrl) === false ||
+            ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
+        ) {
+            throw new \Exception(
+                'Please enable only one setMethod function, LIKE RIGHT NOW !!!'
+            );
+        }
     }
 }
