@@ -1,16 +1,17 @@
 {
-  "name": "solumdesignum/scenarios",
-  "description": "Laravel Dynamic Validation Scenarios",
-  "homepage": "https://solum-designum.eu",
-  "license": "MIT",
-  "authors": [
-	{
-	  "name": "Oskars Germovs",
-	  "email": "oskars_germovs@inbox.lv"
-	}
-  ],
-  "require": {
-      "php": "^7.0|^7.1|^7.2|^7.3|^7.4|^8.0"
+    "name": "solumdesignum/scenarios",
+    "description": "Laravel Dynamic Validation Scenarios",
+    "type": "libary",
+    "homepage": "https://solum-designum.eu",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oskars Germovs",
+            "email": "oskars_germovs@inbox.lv"
+        }
+    ],
+    "require": {
+        "php": "^7.0|^7.1|^7.2|^7.3|^7.4|^8.0"
   },
   "autoload": {
 	"psr-4": {
