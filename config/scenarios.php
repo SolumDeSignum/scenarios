@@ -8,6 +8,6 @@ return [
         'setMethodFromController' => true,
     ],
     'methods' => [
-        'pattern' => '/create|store|update|destroy/im'
-    ]
+        'pattern' => '/create|store|update|destroy/im',
+    ],
 ];

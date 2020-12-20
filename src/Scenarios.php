@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Scenarios;
 
-use Illuminate\Support\Facades\Route;
-
 use function config;
+use Illuminate\Support\Facades\Route;
 use function is_bool;
 
 trait Scenarios
@@ -30,6 +29,7 @@ trait Scenarios
      * Create a new rule instance.
      *
      * Scenarios constructor.
+     *
      * @throws \Exception
      */
     public function __construct()
@@ -62,8 +62,9 @@ trait Scenarios
     /**
      * @param $method
      *
-     * @return string
      * @throws \Exception
+     *
+     * @return string
      */
     public function patternFilter($method): string
     {
