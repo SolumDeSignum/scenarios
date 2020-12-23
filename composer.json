@@ -52,19 +52,5 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "scripts": {
-        "post-update-cmd": [
-            "composer phpcbf"
-        ],
-        "phpstan": [
-            "php artisan code:analyse --level=max"
-        ],
-        "phpcs": [
-            "phpcs --standard=PSR12 /$(pwd)"
-        ],
-        "phpcbf": [
-            "phpcbf --standard=PSR12 /$(pwd)"
-        ]
-    }
+    "prefer-stable": true
 }
