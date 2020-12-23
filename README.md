@@ -1,3 +1,10 @@
+[![StyleCI](https://github.styleci.io/repos/145921620/shield?branch=master)](https://github.styleci.io/repos/145921620)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/SolumDeSignum/scenarios/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/SolumDeSignum/scenarios/?branch=master)
+[![Total Downloads](https://poser.pugx.org/solumdesignum/scenarios/downloads?format=flat)](https://packagist.org/packages/solumdesignum/scenarios)
+[![Latest Stable Version](https://poser.pugx.org/solumdesignum/scenarios/v/stable?format=flat)](https://packagist.org/packages/solumdesignum/scenarios)
+[![Latest Unstable Version](https://poser.pugx.org/solumdesignum/scenarios/v/unstable?format=flat)](https://packagist.org/packages/solumdesignum/scenarios)
+[![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+
 ### Introduction
 Solum DeSignum Scenarios is agnostic backend validation Scenarios package.
 
