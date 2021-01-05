@@ -6,7 +6,6 @@ namespace SolumDeSignum\Scenarios;
 
 use function config;
 use Illuminate\Support\Facades\Route;
-use function is_bool;
 
 trait Scenarios
 {
@@ -68,9 +67,9 @@ trait Scenarios
      */
     public function patternFilter($method): string
     {
-        preg_match_all(
+        \preg_match_all(
             config('scenarios.methods.pattern'),
-            strtolower($method),
+            \mb_strtolower($method),
             $matches
         );
 
@@ -116,8 +115,8 @@ trait Scenarios
     private function exceptionOneSetMethod(): void
     {
         if (
-            is_bool($this->setMethodFromController) === false ||
-            is_bool($this->setMethodFromUrl) === false ||
+            \is_bool($this->setMethodFromController) === false ||
+            \is_bool($this->setMethodFromUrl) === false ||
             ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
         ) {
             throw new \Exception(
@@ -129,8 +128,8 @@ trait Scenarios
     private function exceptionOnlyOneSetMethod(): void
     {
         if (
-            is_bool($this->setMethodFromController) === false ||
-            is_bool($this->setMethodFromUrl) === false ||
+            \is_bool($this->setMethodFromController) === false ||
+            \is_bool($this->setMethodFromUrl) === false ||
             ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
         ) {
             throw new \Exception(
