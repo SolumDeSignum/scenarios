@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Scenarios;
 
-use function config_path;
 use Illuminate\Support\ServiceProvider;
 
 class ScenariosServiceProvider extends ServiceProvider
@@ -19,7 +18,7 @@ class ScenariosServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes(
                 [
-                    __DIR__.'/../config/scenarios.php' => config_path(
+                    __DIR__ . '/../config/scenarios.php' => config_path(
                         'scenarios.php'
                     ),
                 ],
@@ -36,7 +35,7 @@ class ScenariosServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/scenarios.php',
+            __DIR__ . '/../config/scenarios.php',
             'scenarios'
         );
     }

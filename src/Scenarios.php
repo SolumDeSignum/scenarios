@@ -4,25 +4,17 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Scenarios;
 
-use function config;
 use Illuminate\Support\Facades\Route;
+use function config;
+use function is_bool;
 
 trait Scenarios
 {
-    /**
-     * @var string
-     */
-    public $scenario;
+    public string $scenario;
 
-    /**
-     * @var string
-     */
-    public $setMethodFromController;
+    public mixed $setMethodFromController;
 
-    /**
-     * @var string
-     */
-    public $setMethodFromUrl;
+    public mixed $setMethodFromUrl;
 
     /**
      * Create a new rule instance.
@@ -58,24 +50,64 @@ trait Scenarios
         }
     }
 
+    private function exceptionOneSetMethod(): void
+    {
+        if (
+            !is_bool($this->setMethodFromController) ||
+            !is_bool($this->setMethodFromUrl) ||
+            ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
+        ) {
+            throw new \Exception(
+                'Please enable at least one setMethod function, LIKE RIGHT NOW !!!'
+            );
+        }
+    }
+
+    private function exceptionOnlyOneSetMethod(): void
+    {
+        if (
+            !is_bool($this->setMethodFromController) ||
+            !is_bool($this->setMethodFromUrl) ||
+            ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
+        ) {
+            throw new \Exception(
+                'Please enable only one setMethod function, LIKE RIGHT NOW !!!'
+            );
+        }
+    }
+
     /**
      * @param $method
      *
+     * @return string
      * @throws \Exception
      *
-     * @return string
      */
     public function patternFilter($method): string
     {
-        \preg_match_all(
+        preg_match_all(
             config('scenarios.methods.pattern'),
-            \mb_strtolower($method),
+            strtolower($method),
             $matches
         );
 
         $this->exceptionScenarioPattern($matches[0][0]);
 
         return $matches[0][0];
+    }
+
+    /**
+     * @param mixed $matches
+     *
+     * @throws \Exception
+     */
+    private function exceptionScenarioPattern($matches): void
+    {
+        if (!isset($matches)) {
+            throw new \Exception(
+                'Scenarios patternFilter failed finding match, check $scenarioPattern , LIKE RIGHT NOW !!!'
+            );
+        }
     }
 
     /**
@@ -96,45 +128,5 @@ trait Scenarios
         return Route::getCurrentRequest() !== null ?
             Route::getCurrentRequest()->getRequestUri() :
             null;
-    }
-
-    /**
-     * @param mixed $matches
-     *
-     * @throws \Exception
-     */
-    private function exceptionScenarioPattern($matches): void
-    {
-        if (isset($matches) === false) {
-            throw new \Exception(
-                'Scenarios patternFilter failed finding match, check $scenarioPattern , LIKE RIGHT NOW !!!'
-            );
-        }
-    }
-
-    private function exceptionOneSetMethod(): void
-    {
-        if (
-            \is_bool($this->setMethodFromController) === false ||
-            \is_bool($this->setMethodFromUrl) === false ||
-            ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
-        ) {
-            throw new \Exception(
-                'Please enable at least one setMethod function, LIKE RIGHT NOW !!!'
-            );
-        }
-    }
-
-    private function exceptionOnlyOneSetMethod(): void
-    {
-        if (
-            \is_bool($this->setMethodFromController) === false ||
-            \is_bool($this->setMethodFromUrl) === false ||
-            ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
-        ) {
-            throw new \Exception(
-                'Please enable only one setMethod function, LIKE RIGHT NOW !!!'
-            );
-        }
     }
 }
