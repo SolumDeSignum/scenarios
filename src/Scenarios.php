@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Scenarios;
 
+use Exception;
 use Illuminate\Support\Facades\Route;
-use function config;
-use function is_bool;
 
 trait Scenarios
 {
@@ -21,69 +20,61 @@ trait Scenarios
      *
      * Scenarios constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
-        // Set Config
-        $this->setMethodFromController = config(
-            'scenarios.features.setMethodFromController',
-            true
-        );
-        $this->setMethodFromUrl = config(
-            'scenarios.features.setMethodFromUrlSegment',
-            false
-        );
+        $this->setMethodFromController = config('scenarios.features.setMethodFromController', true);
+        $this->setMethodFromUrl = config('scenarios.features.setMethodFromUrlSegment', false);
 
-        // Detect package abuse
         $this->exceptionOneSetMethod();
         $this->exceptionOnlyOneSetMethod();
 
-        // setMethod based on Controller function
         if ($this->setMethodFromController) {
             $this->scenario = $this->patternFilter($this->currentControllerMethod());
         }
 
-        // setMethod based on Request segment based on $controllerMethodPattern
         if ($this->setMethodFromUrl) {
             $this->scenario = $this->patternFilter($this->currentRequestUri());
         }
     }
 
-    private function exceptionOneSetMethod(): void
+    /**
+     * @throws Exception
+     */
+    public function exceptionOneSetMethod(): void
     {
         if (
             !is_bool($this->setMethodFromController) ||
             !is_bool($this->setMethodFromUrl) ||
             ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
         ) {
-            throw new \Exception(
+            throw new Exception(
                 'Please enable at least one setMethod function, LIKE RIGHT NOW !!!'
             );
         }
     }
 
-    private function exceptionOnlyOneSetMethod(): void
+    /**
+     * @throws Exception
+     */
+    public function exceptionOnlyOneSetMethod(): void
     {
         if (
             !is_bool($this->setMethodFromController) ||
             !is_bool($this->setMethodFromUrl) ||
             ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
         ) {
-            throw new \Exception(
+            throw new Exception(
                 'Please enable only one setMethod function, LIKE RIGHT NOW !!!'
             );
         }
     }
 
     /**
-     * @param $method
-     *
-     * @return string
-     * @throws \Exception
-     *
+     * @throws Exception
      */
-    public function patternFilter($method): string
+    public function patternFilter(string $method): string
     {
         preg_match_all(
             config('scenarios.methods.pattern'),
@@ -97,22 +88,17 @@ trait Scenarios
     }
 
     /**
-     * @param mixed $matches
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    private function exceptionScenarioPattern($matches): void
+    public function exceptionScenarioPattern(mixed $matches): void
     {
         if (!isset($matches)) {
-            throw new \Exception(
+            throw new Exception(
                 'Scenarios patternFilter failed finding match, check $scenarioPattern , LIKE RIGHT NOW !!!'
             );
         }
     }
 
-    /**
-     * @return string|null
-     */
     public function currentControllerMethod(): ?string
     {
         return Route::current() !== null ?
@@ -120,9 +106,6 @@ trait Scenarios
             null;
     }
 
-    /**
-     * @return string|null
-     */
     public function currentRequestUri(): ?string
     {
         return Route::getCurrentRequest() !== null ?
