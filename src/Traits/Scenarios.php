@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SolumDeSignum\Scenarios;
+namespace SolumDeSignum\Scenarios\Traits;
 
 use Exception;
 use Illuminate\Support\Facades\Route;

@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Mockery;
 use Orchestra\Testbench\TestCase;
-use SolumDeSignum\Scenarios\Scenarios;
+use SolumDeSignum\Scenarios\Traits\Scenarios;
 
 class ScenariosTest extends TestCase
 {
@@ -132,10 +132,10 @@ class ScenariosTest extends TestCase
      */
     private function mockConfig(): void
     {
-        $this->config = $this->app->make('config');
-        $this->config->set('scenarios.features.setMethodFromController', true);
-        $this->config->set('scenarios.features.setMethodFromUrlSegment', false);
-        $this->config->set('scenarios.methods.pattern', '/create|store|update|destroy/im');
+        $config = $this->app->make('config');
+        $config->set('scenarios.features.setMethodFromController', true);
+        $config->set('scenarios.features.setMethodFromUrlSegment', false);
+        $config->set('scenarios.methods.pattern', '/create|store|update|destroy/im');
     }
 
 

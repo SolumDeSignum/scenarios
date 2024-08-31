@@ -6,7 +6,7 @@
 [![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 ### Introduction
-Solum DeSignum Scenarios is agnostic backend validation Scenarios package.
+Scenarios are agnostic backend validation Scenarios package.
 
 
 ### Installation
@@ -21,9 +21,11 @@ Next, publish Scenarios resources using the vendor:publish command:
 php artisan vendor:publish --provider="SolumDeSignum\Scenarios\ScenariosServiceProvider"
 ```
 
-This command will publish Scenarios config to your config directory, which will be
+This command will publish scenarios.php config to your config directory, which will be
  created if it does not exist.
 
+### Upgrade from v1.xx to version v2.00
+[UPGRADE_V2.md](UPGRADE_V2.md) !!!
 
 ### Scenarios Features
 The Scenarios configuration file contains a configuration array.
@@ -44,6 +46,7 @@ return [
 ````
 
 ### Scenario's With Form Request Validation
+
 ```php
 <?php
 
@@ -53,8 +56,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use SolumDeSignum\Scenarios\Scenarios;
-
+use SolumDeSignum\Scenarios\Traits\Scenarios;
 
 class OfficeBlogRequest extends FormRequest
 {
@@ -110,11 +112,10 @@ class OfficeBlogRequest extends FormRequest
 
 ### Validation Rules Usage
 #### However, can be used on both examples
+
 ```php
 namespace App\Validation;
 	
-use SolumDeSignum\Scenarios\Scenarios;
-
 class SampleRules
 {
   public static function ScenarioRules(string $scenario): ?array
@@ -141,6 +142,7 @@ class SampleRules
 
 ### Scenario's With Controller 
 #### Manually Creating Validators
+
 ```php
 <?php
 
@@ -148,9 +150,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Office\Blog;
 
-use Illuminate\Support\Facades\Validator;
-use SolumDeSignum\Scenarios\Scenarios;
-use App\Validation\SampleRules;
+use App\Validation\SampleRules;use Illuminate\Support\Facades\Validator;use SolumDeSignum\Scenarios\Traits\Scenarios;
 
 class BlogController
 {
