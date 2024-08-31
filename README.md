@@ -21,8 +21,7 @@ Next, publish Scenarios resources using the vendor:publish command:
 php artisan vendor:publish --provider="SolumDeSignum\Scenarios\ScenariosServiceProvider"
 ```
 
-This command will publish scenarios.php config to your config directory, which will be
- created if it does not exist.
+This command will publish scenarios.php config to your config directory, which will be created if it does not exist.
 
 ### Upgrade from v1.xx to version v2.00
 [UPGRADE_V2.md](UPGRADE_V2.md) !!!
@@ -36,16 +35,131 @@ declare(strict_types=1);
 
 return [
     'features' => [
-        'setMethodFromUrlSegment' => false,
-        'setMethodFromController' => true,
+        'set_method' => [
+            'from' => [
+                'controller' => true,
+                'url_segment' => false,
+            ],
+            'exceptions' => [
+                'controller' => true
+            ],
+        ],
     ],
     'methods' => [
-        'pattern' => '/create|store|update|destroy/im'
-    ]
+        'pattern' => '/create|store|update|destroy/im',
+    ],
 ];
 ````
 
-### Scenario's With Form Request Validation
+### Scenario's with Controller
+Before using it must change config 
+```php
+<?php 
+
+declare(strict_types=1);
+
+return [
+    'features' => [
+        'set_method' => [
+            'from' => [
+                'controller' => true,
+                'url_segment' => false,
+            ],
+            'exceptions' => [
+                'controller' => false
+            ],
+        ],
+    ],
+    'methods' => [
+        'pattern' => '/create|store|update|destroy/im',
+    ],
+];
+````
+Now we are prepared to use it in controller.
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use SolumDeSignum\Scenarios\Traits\Scenarios;
+
+class ExampleControler extends Controller
+{
+    use Scenarios;
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): void
+    {
+        dump($this);
+        dd($this->scenario);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): void
+    {
+        if ($this->scenario === 'create') {
+            // my logic
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): void
+    {
+        if ($this->scenario === 'store') {
+            // my logic
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id): void
+    {
+        dump($this);
+        dd($this->scenario);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id): void
+    {
+        dump($this);
+        dd($this->scenario);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id): void
+    {
+        if ($this->scenario === 'update') {
+            // my logic
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id): void
+    {
+        if ($this->scenario === 'destroy') {
+            // my logic
+        }
+    }
+}
+````
+
+### Scenario's with your Form Request Validation
 
 ```php
 <?php
@@ -150,7 +264,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Office\Blog;
 
-use App\Validation\SampleRules;use Illuminate\Support\Facades\Validator;use SolumDeSignum\Scenarios\Traits\Scenarios;
+use App\Validation\SampleRules;
+use Illuminate\Support\Facades\Validator;
+use SolumDeSignum\Scenarios\Traits\Scenarios;
 
 class BlogController
 {

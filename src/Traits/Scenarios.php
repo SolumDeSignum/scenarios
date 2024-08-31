@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 trait Scenarios
 {
-    public string $scenario;
+    public ?string $scenario = null;
 
     public bool $setMethodFromController;
 
@@ -24,8 +24,8 @@ trait Scenarios
      */
     public function __construct()
     {
-        $this->setMethodFromController = config('scenarios.features.setMethodFromController', true);
-        $this->setMethodFromUrl = config('scenarios.features.setMethodFromUrlSegment', false);
+        $this->setMethodFromController = config('scenarios.features.set_method.from.controller', true);
+        $this->setMethodFromUrl = config('scenarios.features.set_method.from.url_segment', false);
 
         $this->validateConfiguration();
 
@@ -69,6 +69,7 @@ trait Scenarios
     public function filterPattern(?string $method, ?string $overridePattern = null): mixed
     {
         $message = null;
+        $getExceptionSetting = config('scenarios.features.set_method.exceptions.controller', true);
 
         if (empty($method)) {
             $matches = null;
@@ -83,8 +84,15 @@ trait Scenarios
             );
         }
 
-        if (empty($matches[0]) && !empty($method)) {
+
+        if ($getExceptionSetting === true && empty($matches[0]) && !empty($method)) {
             $message = 'No pattern matches found. Check the scenario pattern configuration.';
+        } elseif ($getExceptionSetting === false && empty($matches[0]) && !empty($method)) {
+            $matches = [
+                [
+                    null
+                ]
+            ];
         }
 
         if ($message !== null) {

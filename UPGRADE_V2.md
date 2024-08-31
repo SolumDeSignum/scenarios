@@ -33,3 +33,44 @@ to
 
     use SolumDeSignum\Scenarios\Traits\Scenarios;
 ````
+
+### Config Change:
+The config has changed from:
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'features' => [        
+        'setMethodFromUrlSegment' => false,
+        'setMethodFromController' => true,
+    ],
+    'methods' => [
+        'pattern' => '/create|store|update|destroy/im',
+    ],
+];
+````
+to
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'features' => [
+        'set_method' => [
+            'from' => [
+                'controller' => true,
+                'url_segment' => false,
+            ],
+            'exceptions' => [
+                'controller' => false
+            ],
+        ],
+    ],
+    'methods' => [
+        'pattern' => '/create|store|update|destroy/im',
+    ],
+];
+````

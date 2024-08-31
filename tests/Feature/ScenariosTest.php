@@ -133,8 +133,9 @@ class ScenariosTest extends TestCase
     private function mockConfig(): void
     {
         $config = $this->app->make('config');
-        $config->set('scenarios.features.setMethodFromController', true);
-        $config->set('scenarios.features.setMethodFromUrlSegment', false);
+        $config->set('scenarios.features.set_method.from.controller', true);
+        $config->set('scenarios.features.set_method.from.url_segment', false);
+        $config->set('scenarios.features.set_method.exceptions.controller', true);
         $config->set('scenarios.methods.pattern', '/create|store|update|destroy/im');
     }
 
