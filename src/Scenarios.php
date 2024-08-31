@@ -11,9 +11,9 @@ trait Scenarios
 {
     public string $scenario;
 
-    public mixed $setMethodFromController;
+    public bool $setMethodFromController;
 
-    public mixed $setMethodFromUrl;
+    public bool $setMethodFromUrl;
 
     /**
      * Create a new rule instance.
@@ -27,78 +27,78 @@ trait Scenarios
         $this->setMethodFromController = config('scenarios.features.setMethodFromController', true);
         $this->setMethodFromUrl = config('scenarios.features.setMethodFromUrlSegment', false);
 
-        $this->exceptionOneSetMethod();
-        $this->exceptionOnlyOneSetMethod();
+        $this->validateConfiguration();
 
         if ($this->setMethodFromController) {
-            $this->scenario = $this->patternFilter($this->currentControllerMethod());
-        }
-
-        if ($this->setMethodFromUrl) {
-            $this->scenario = $this->patternFilter($this->currentRequestUri());
+            $this->scenario = $this->filterPattern($this->currentControllerMethod());
+        } elseif ($this->setMethodFromUrl) {
+            $this->scenario = $this->filterPattern($this->currentRequestUri());
         }
     }
 
     /**
+     * Validates the configuration to ensure only one method is enabled.
+     *
      * @throws Exception
      */
-    public function exceptionOneSetMethod(): void
+    public function validateConfiguration(): void
     {
-        if (
-            !is_bool($this->setMethodFromController) ||
-            !is_bool($this->setMethodFromUrl) ||
-            ($this->setMethodFromController === false && $this->setMethodFromUrl === false)
-        ) {
-            throw new Exception(
-                'Please enable at least one setMethod function, LIKE RIGHT NOW !!!'
+        $message = null;
+
+        if ($this->setMethodFromController === false && $this->setMethodFromUrl === false) {
+            $message = 'Please enable at least one setMethod function.';
+        }
+
+        if ($this->setMethodFromController === true && $this->setMethodFromUrl === true) {
+            $message = 'Please enable only one setMethod function.';
+        }
+
+        if ($message !== null) {
+            throw new Exception($message);
+        }
+    }
+
+    /**
+     * Filters the pattern from the provided method.
+     *
+     * @param string|null $method
+     * @param string|null $overridePattern
+     * @return mixed
+     * @throws Exception
+     */
+    public function filterPattern(?string $method, ?string $overridePattern = null): mixed
+    {
+        $message = null;
+
+        if (empty($method)) {
+            $matches = null;
+            $message = 'Unable to determine the method for pattern filtering.';
+        } else {
+            preg_match_all(
+                $overridePattern !== null
+                    ? $overridePattern
+                    : config('scenarios.methods.pattern'),
+                strtolower($method),
+                $matches
             );
         }
-    }
 
-    /**
-     * @throws Exception
-     */
-    public function exceptionOnlyOneSetMethod(): void
-    {
-        if (
-            !is_bool($this->setMethodFromController) ||
-            !is_bool($this->setMethodFromUrl) ||
-            ($this->setMethodFromController === true && $this->setMethodFromUrl === true)
-        ) {
-            throw new Exception(
-                'Please enable only one setMethod function, LIKE RIGHT NOW !!!'
-            );
+        if (empty($matches[0]) && !empty($method)) {
+            $message = 'No pattern matches found. Check the scenario pattern configuration.';
         }
-    }
 
-    /**
-     * @throws Exception
-     */
-    public function patternFilter(string $method): string
-    {
-        preg_match_all(
-            config('scenarios.methods.pattern'),
-            strtolower($method),
-            $matches
-        );
-
-        $this->exceptionScenarioPattern($matches[0][0]);
+        if ($message !== null) {
+            throw new Exception($message);
+        }
 
         return $matches[0][0];
     }
 
     /**
-     * @throws Exception
+     * Gets the current controller method.
+     *
+     * @return string|null
      */
-    public function exceptionScenarioPattern(mixed $matches): void
-    {
-        if (!isset($matches)) {
-            throw new Exception(
-                'Scenarios patternFilter failed finding match, check $scenarioPattern , LIKE RIGHT NOW !!!'
-            );
-        }
-    }
-
     public function currentControllerMethod(): ?string
     {
         return Route::current() !== null ?
@@ -106,6 +106,11 @@ trait Scenarios
             null;
     }
 
+    /**
+     * Gets the current request URI.
+     *
+     * @return string|null
+     */
     public function currentRequestUri(): ?string
     {
         return Route::getCurrentRequest() !== null ?

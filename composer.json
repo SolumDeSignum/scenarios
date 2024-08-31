@@ -36,7 +36,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "SolumDeSignum\\Scenarios\\Tests\\": "tests"
+            "SolumDeSignum\\Scenarios\\Tests\\": "tests/"
         }
     },
     "extra": {
