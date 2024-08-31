@@ -16,12 +16,9 @@ class ScenariosServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes(
-                [
-                    __DIR__ . '/../config/scenarios.php' => config_path(
-                        'scenarios.php'
-                    ),
-                ],
+            $this->publishes([
+                __DIR__ . '/../config/scenarios.php' => config_path('scenarios.php')
+            ],
                 'config'
             );
         }
