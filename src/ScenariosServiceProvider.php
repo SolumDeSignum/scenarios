@@ -51,7 +51,7 @@ class ScenariosServiceProvider extends ServiceProvider implements DeferrableProv
         $this->publishes([
             __DIR__ . '/../config/scenarios.php' => config_path('scenarios.php')
         ],
-            'config'
+            'scenarios.config'
         );
     }
 }
