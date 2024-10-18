@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Scenarios;
 
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class ScenariosServiceProvider extends ServiceProvider implements DeferrableProvider
+class ScenariosServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application events.
@@ -33,16 +32,6 @@ class ScenariosServiceProvider extends ServiceProvider implements DeferrableProv
             __DIR__ . '/../config/scenarios.php',
             'scenarios'
         );
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides(): array
-    {
-        return parent::provides();
     }
 
     protected function bootForConsole(): void
